@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h1>{{ student.name }} ({{ student.id }})</h1>
+  <div class="muted">Manage allowed skills + upload remediation files per skill.</div>
+
+  <h2>Skill permissions</h2>
+  <table class="table">
+    <thead><tr><th>Skill</th><th>Allowed</th><th>Times tested</th><th>Best</th><th>Actions</th></tr></thead>
+    <tbody>
+      {% for sk in skills %}
+        {% set perm = perms.get(sk.id) %}
+        {% set allowed = perm and perm.allowed %}
+        {% set sk_attempts = attempts | selectattr('skill_id', 'equalto', sk.id) | list %}
+        <tr>
+          <td>{{ sk.name }}</td>
+          <td>{{ "✅" if allowed else "🔒" }}</td>
+          <td>{{ sk_attempts|length }}</td>
+          <td>
+            {% set best = 0 %}
+            {% for a in sk_attempts %}
+              {% if a.score and a.score*100 > best %}{% set best = a.score*100 %}{% endif %}
+            {% endfor %}
+            {{ best|round(0) }}%
+          </td>
+          <td>
+            <form method="post" action="{{ url_for('teacher.toggle_skill', student_id=student.id) }}" style="display:inline;">
+              <input type="hidden" name="skill_id" value="{{ sk.id }}">
+              <input type="hidden" name="allowed" value="{{ 0 if allowed else 1 }}">
+              <button class="btn sm" type="submit">{{ "Lock" if allowed else "Allow" }}</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h2>Upload remediation file (PDF/PP/Word/Video)</h2>
+  <form method="post" action="{{ url_for('teacher.upload_remediation', student_id=student.id) }}" enctype="multipart/form-data" class="form">
+    <label>Skill</label>
+    <select name="skill_id" required>
+      {% for sk in skills %}
+        <option value="{{ sk.id }}">{{ sk.name }}</option>
+      {% endfor %}
+    </select>
+
+    <label>Note (what you did to elevate the skill)</label>
+    <input name="note" placeholder="Short description">
+
+    <label>File</label>
+    <input type="file" name="file" required>
+
+    <button class="btn" type="submit">Upload</button>
+  </form>
+
+  <h2>Recent reports</h2>
+  <table class="table">
+    <thead><tr><th>Skill</th><th>Finished</th><th>Score</th><th>PDF</th></tr></thead>
+    <tbody>
+      {% for a in attempts[:30] %}
+        <tr>
+          <td>{{ a.skill.name }}</td>
+          <td>{{ a.finished_at.strftime('%Y-%m-%d %H:%M') if a.finished_at else "—" }}</td>
+          <td>{{ (a.score*100)|round(0) ~ "%" if a.score is not none else "—" }}</td>
+          <td>
+            {% if a.pdf_path %}
+              <a class="link" href="{{ url_for('teacher.download_report', attempt_id=a.id) }}">Download</a>
+            {% else %}
+              —
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h2>Uploaded remediation files</h2>
+  {% if rem_files %}
+    <ul class="list">
+      {% for f in rem_files %}
+        <li>
+          <b>{{ f.skill.name }}</b> — {{ f.filename }}
+          {% if f.note %}<div class="muted">{{ f.note }}</div>{% endif %}
+          <a class="link" href="{{ url_for('files.remediation', upload_id=f.id) }}" target="_blank">Open</a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <div class="muted">No remediation files uploaded yet.</div>
+  {% endif %}
+
+  <a class="linkBtn" href="{{ url_for('teacher.dashboard') }}">Back</a>
+</div>
+{% endblock %}

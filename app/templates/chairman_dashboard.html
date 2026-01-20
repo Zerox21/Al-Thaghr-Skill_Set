@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Chairman dashboard</h1>
+
+<div class="grid">
+  <div class="card">
+    <h2>Quick links</h2>
+    <a class="linkBtn" href="{{ url_for('chairman.users') }}">Users & imports</a>
+    <a class="linkBtn" href="{{ url_for('chairman.skills') }}">Skills</a>
+    <a class="linkBtn" href="{{ url_for('chairman.question_tool') }}">Question tool</a>
+    <a class="linkBtn" href="{{ url_for('chairman.attempts') }}">All attempts</a>
+  </div>
+
+  <div class="card">
+    <h2>Teacher performance</h2>
+    <table class="table">
+      <thead><tr><th>Teacher</th><th>Attempts</th><th>Avg</th></tr></thead>
+      <tbody>
+        {% for r in perf %}
+          <tr>
+            <td>{{ r.teacher.name }} ({{ r.teacher.id }})</td>
+            <td>{{ r.attempts }}</td>
+            <td>{{ r.avg }}%</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Students needing attention (lowest averages)</h2>
+    <table class="table">
+      <thead><tr><th>Student</th><th>Attempts</th><th>Avg</th></tr></thead>
+      <tbody>
+        {% for r in sperf[:10] %}
+          <tr>
+            <td>{{ r.student.name }} ({{ r.student.id }})</td>
+            <td>{{ r.attempts }}</td>
+            <td>{{ r.avg }}%</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

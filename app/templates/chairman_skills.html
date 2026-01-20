@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h1>Skills</h1>
+  <form method="post" action="{{ url_for('chairman.add_skill') }}" class="form">
+    <label>Name</label><input name="name" required placeholder="Skill name">
+    <label>Order</label><input name="order_index" type="number" value="0">
+    <label>Duration minutes (optional)</label><input name="duration_min" type="number" placeholder="e.g. 20">
+    <button class="btn" type="submit">Add skill</button>
+  </form>
+
+  <h2>Existing</h2>
+  <table class="table">
+    <thead><tr><th>Order</th><th>Name</th><th>Duration</th><th>Active</th></tr></thead>
+    <tbody>
+      {% for s in skills %}
+        <tr>
+          <td>{{ s.order_index }}</td>
+          <td>{{ s.name }}</td>
+          <td>{{ s.duration_min or "default" }}</td>
+          <td>{{ "✅" if s.is_active else "—" }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <a class="linkBtn" href="{{ url_for('chairman.dashboard') }}">Back</a>
+</div>
+{% endblock %}

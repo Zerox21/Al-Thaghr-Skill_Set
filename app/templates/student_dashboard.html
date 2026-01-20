@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Student dashboard</h1>
+
+<div class="grid">
+  <div class="card">
+    <h2>Your teacher</h2>
+    {% if teacher %}
+      <div><b>{{ teacher.name }}</b> ({{ teacher.id }})</div>
+      {% if teacher.email %}<div class="muted">{{ teacher.email }}</div>{% endif %}
+    {% else %}
+      <div class="muted">No teacher linked. Log out and select your teacher.</div>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <h2>Weekly access rule</h2>
+    <div class="muted">1 test attempt per week (configurable). If you already started an attempt this week, you will be blocked.</div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Skills</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Skill</th>
+        <th>Allowed</th>
+        <th>Times tested</th>
+        <th>Best score</th>
+        <th>Last attempt</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in progress %}
+        <tr>
+          <td>{{ row.skill.name }}</td>
+          <td>{{ "✅" if row.allowed else "🔒" }}</td>
+          <td>{{ row.times }}</td>
+          <td>{{ row.best }}%</td>
+          <td>{{ row.last.strftime('%Y-%m-%d %H:%M') if row.last else "—" }}</td>
+          <td>
+            {% if row.allowed %}
+              <a class="btn sm" href="{{ url_for('student.start', skill_id=row.skill.id) }}">Start</a>
+            {% else %}
+              <span class="muted">Locked</span>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <h2>Recent attempts</h2>
+    <table class="table">
+      <thead><tr><th>Skill</th><th>Started</th><th>Status</th><th>Score</th><th></th></tr></thead>
+      <tbody>
+        {% for a in attempts %}
+          <tr>
+            <td>{{ a.skill.name }}</td>
+            <td>{{ a.started_at.strftime('%Y-%m-%d %H:%M') }}</td>
+            <td>{{ "Finished" if a.finished_at else "In progress" }}</td>
+            <td>{{ (a.score*100)|round(0) ~ "%" if a.score is not none else "—" }}</td>
+            <td>
+              {% if a.pdf_path %}
+                <a class="link" href="{{ url_for('student.download_report', attempt_id=a.id) }}">PDF</a>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Teacher remediation files</h2>
+    {% if rem_files %}
+      <ul class="list">
+        {% for f in rem_files %}
+          <li>
+            <div><b>{{ f.skill.name }}</b> — {{ f.filename }}</div>
+            {% if f.note %}<div class="muted">{{ f.note }}</div>{% endif %}
+            <a class="link" href="{{ url_for('files.remediation', upload_id=f.id) }}" target="_blank">Open</a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="muted">No files uploaded yet.</div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h1>Users</h1>
+
+  <h2>Add teacher</h2>
+  <form method="post" action="{{ url_for('chairman.add_teacher') }}" class="form">
+    <label>Teacher ID</label><input name="tid" required>
+    <label>Name</label><input name="name" required>
+    <label>Email (optional)</label><input name="email">
+    <label>PIN (default 1234)</label><input name="pin" placeholder="1234">
+    <button class="btn" type="submit">Add</button>
+  </form>
+
+  <h2>Import students (CSV)</h2>
+  <div class="notice">
+    CSV columns required: <code>student_id,name</code>. Optional: <code>pin,teacher_id</code>.<br>
+    Example row: <code>s002,Student Two,1234,t001</code>
+  </div>
+  <form method="post" action="{{ url_for('chairman.import_students') }}" enctype="multipart/form-data" class="form">
+    <input type="file" name="csv_file" accept=".csv" required>
+    <button class="btn" type="submit">Import</button>
+  </form>
+
+  <h2>Teachers</h2>
+  <table class="table">
+    <thead><tr><th>ID</th><th>Name</th><th>Email</th></tr></thead>
+    <tbody>
+      {% for t in teachers %}
+        <tr><td>{{ t.id }}</td><td>{{ t.name }}</td><td>{{ t.email or "—" }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h2>Students</h2>
+  <table class="table">
+    <thead><tr><th>ID</th><th>Name</th><th>Teacher</th></tr></thead>
+    <tbody>
+      {% for s in students %}
+        <tr><td>{{ s.id }}</td><td>{{ s.name }}</td><td>{{ s.teacher_id or "—" }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <a class="linkBtn" href="{{ url_for('chairman.dashboard') }}">Back</a>
+</div>
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h1>Question tool</h1>
+  <p class="muted">Add questions to skills. Supports MCQ, multi-select, short text, image, and interactive video (cue points).</p>
+
+  <h2>Add question</h2>
+  <form method="post" action="{{ url_for('chairman.add_question') if role == 'chairman' else url_for('teacher.add_question') }}" class="form">
+    <label>Skill</label>
+    <select name="skill_id" required>
+      {% for s in skills %}
+        <option value="{{ s.id }}">{{ s.name }}</option>
+      {% endfor %}
+    </select>
+
+    <label>Type</label>
+    <select name="qtype" required>
+      <option value="mcq_single">mcq_single</option>
+      <option value="mcq_multi">mcq_multi</option>
+      <option value="true_false">true_false</option>
+      <option value="short_text">short_text</option>
+      <option value="image_mcq_single">image_mcq_single</option>
+      <option value="video_cued_mcq_single">video_cued_mcq_single</option>
+    </select>
+
+    <label>Prompt</label>
+    <textarea name="prompt" rows="3" required></textarea>
+
+    <label>Options (one per line) — required for MCQ types</label>
+    <textarea name="options" rows="4" placeholder="Option 0&#10;Option 1&#10;Option 2"></textarea>
+
+    <label>Answer</label>
+    <div class="notice">
+      For <b>mcq_single/true_false/image/video</b>: put the correct option index (0-based).<br>
+      For <b>mcq_multi</b>: comma-separated indices, e.g. <code>0,2</code>.<br>
+      For <b>short_text</b>: write the expected text (exact match).
+    </div>
+    <input name="answer" placeholder="e.g. 1 or 0,2 or a text answer">
+
+    <label>Meta (optional)</label>
+    <div class="notice">
+      For <b>image_mcq_single</b>: <code>{"image_url":"/static/uploads/your.png"}</code><br>
+      For <b>video_cued_mcq_single</b>: <code>{"video_url":"/static/uploads/your.mp4","cues":[5,12]}</code>
+    </div>
+    <textarea name="meta" rows="3" placeholder='{"image_url":"/static/uploads/img.png"}'></textarea>
+
+    <button class="btn" type="submit">Add</button>
+  </form>
+
+  <h2>Recent questions</h2>
+  <table class="table">
+    <thead><tr><th>ID</th><th>Skill</th><th>Type</th><th>Prompt</th></tr></thead>
+    <tbody>
+      {% for q in questions %}
+        <tr>
+          <td>{{ q.id }}</td>
+          <td>{{ q.skill.name }}</td>
+          <td><code>{{ q.qtype }}</code></td>
+          <td>{{ q.prompt|truncate(120) }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="muted">Tip: copy media files into <code>app/static/uploads/</code> and reference them from Meta.</div>
+
+  <a class="linkBtn" href="{{ url_for('chairman.dashboard') if role == 'chairman' else url_for('teacher.dashboard') }}">Back</a>
+</div>
+{% endblock %}

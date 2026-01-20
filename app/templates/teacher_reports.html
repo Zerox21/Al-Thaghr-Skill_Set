@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h1>Teacher reports</h1>
+  <table class="table">
+    <thead><tr><th>Student</th><th>Skill</th><th>Finished</th><th>Score</th><th>PDF</th></tr></thead>
+    <tbody>
+      {% for a in attempts %}
+        <tr>
+          <td>{{ a.student.name }} ({{ a.student.id }})</td>
+          <td>{{ a.skill.name }}</td>
+          <td>{{ a.finished_at.strftime('%Y-%m-%d %H:%M') if a.finished_at else "—" }}</td>
+          <td>{{ (a.score*100)|round(0) ~ "%" if a.score is not none else "—" }}</td>
+          <td>
+            {% if a.pdf_path %}
+              <a class="link" href="{{ url_for('teacher.download_report', attempt_id=a.id) }}">Download</a>
+            {% else %}—{% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <a class="linkBtn" href="{{ url_for('teacher.dashboard') }}">Back</a>
+</div>
+{% endblock %}

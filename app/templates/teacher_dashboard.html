@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Teacher dashboard</h1>
+
+<div class="grid">
+  <div class="card">
+    <h2>Your performance</h2>
+    <div class="muted">Average score across all finished attempts</div>
+    <div class="big">{{ avg_score }}%</div>
+    <a class="linkBtn" href="{{ url_for('teacher.reports') }}">View reports</a>
+    <a class="linkBtn" href="{{ url_for('teacher.question_tool') }}">Question tool</a>
+  </div>
+
+  <div class="card">
+    <h2>Your students</h2>
+    {% if student_rows %}
+      <table class="table">
+        <thead><tr><th>Student</th><th>Attempts</th><th>Avg</th><th></th></tr></thead>
+        <tbody>
+          {% for r in student_rows %}
+            <tr>
+              <td>{{ r.student.name }} ({{ r.student.id }})</td>
+              <td>{{ r.attempts }}</td>
+              <td>{{ r.avg }}%</td>
+              <td><a class="link" href="{{ url_for('teacher.student_detail', student_id=r.student.id) }}">Open</a></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <div class="muted">No students linked to you yet.</div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

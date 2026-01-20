@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h1>{{ skill.name }}</h1>
+  <div class="muted">Attempt #{{ attempt.id }} — Time limit: <b>{{ duration_min }} minutes</b></div>
+  <div class="timer">Time left: <span id="timeLeft">--:--</span></div>
+
+  <form method="post" action="{{ url_for('student.submit', attempt_id=attempt.id) }}" id="testForm">
+    {% for q in questions %}
+      <div class="q">
+        <div class="qtitle">{{ loop.index }}. {{ q.prompt }}</div>
+
+        {% if q.qtype in ["mcq_single","true_false","image_mcq_single","video_cued_mcq_single"] %}
+          {% if q.qtype == "image_mcq_single" %}
+            {% set meta = q.meta_json and (q.meta_json|loads) or {} %}
+            {% if meta and meta.get("image_url") %}
+              {% if meta.get('image_url') %}<img class="media" src="{{ meta.get('image_url') }}" alt="question image">{% elif meta.get('image_media') %}<img class="media" src="{{ url_for('files.media', relpath=meta.get('image_media')) }}" alt="question image">{% endif %}
+            {% endif %}
+          {% endif %}
+
+          {% if q.qtype == "video_cued_mcq_single" %}
+            {% set meta = q.meta_json and (q.meta_json|loads) or {} %}
+            <div class="videoBox">
+              <video id="vid_{{ q.id }}" class="video" controls preload="metadata">
+                <source src="{% if meta %}{% if meta.get('video_url') %}{{ meta.get('video_url') }}{% elif meta.get('video_media') %}{{ url_for('files.media', relpath=meta.get('video_media')) }}{% endif %}{% endif %}" type="video/mp4">
+              </video>
+              <div class="muted small">Interactive video: it pauses at cue points and resumes after you answer.</div>
+              <div class="overlay" id="overlay_{{ q.id }}" hidden>
+                <div class="overlayCard">
+                  <div class="overlayTitle">Answer to continue</div>
+                  <div class="overlayNote">Choose an option, then the video continues.</div>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+
+          <div class="opts">
+            {% for opt in (q.options_json|loads) %}
+              <label class="opt">
+                <input type="radio" name="q_{{ q.id }}" value="{{ loop.index0 }}">
+                <span>{{ opt }}</span>
+              </label>
+            {% endfor %}
+          </div>
+
+        {% elif q.qtype == "mcq_multi" %}
+          <div class="opts">
+            {% for opt in (q.options_json|loads) %}
+              <label class="opt">
+                <input type="checkbox" name="q_{{ q.id }}" value="{{ loop.index0 }}">
+                <span>{{ opt }}</span>
+              </label>
+            {% endfor %}
+          </div>
+
+        {% elif q.qtype == "short_text" %}
+          <input class="input" name="q_{{ q.id }}" placeholder="Type your answer">
+
+        {% else %}
+          <div class="muted">Unsupported question type: {{ q.qtype }}</div>
+        {% endif %}
+      </div>
+    {% endfor %}
+
+    <button class="btn" type="submit" id="submitBtn">Submit</button>
+  </form>
+
+  <div class="notice">
+    <b>Important:</b> When time is up, the test auto-submits.
+  </div>
+</div>
+
+<script>
+  const totalSeconds = {{ duration_min }} * 60;
+  const startedAt = new Date("{{ attempt.started_at.isoformat() }}Z").getTime();
+  let remaining = Math.max(0, totalSeconds - Math.floor((Date.now() - startedAt)/1000));
+
+  const timeLeftEl = document.getElementById('timeLeft');
+  const form = document.getElementById('testForm');
+  const submitBtn = document.getElementById('submitBtn');
+
+  function fmt(s){
+    const m = Math.floor(s/60);
+    const r = s%60;
+    return String(m).padStart(2,'0') + ":" + String(r).padStart(2,'0');
+  }
+  function tick(){
+    timeLeftEl.textContent = fmt(remaining);
+    if (remaining <= 0){
+      submitBtn.disabled = true;
+      form.submit();
+      return;
+    }
+    remaining -= 1;
+    setTimeout(tick, 1000);
+  }
+  tick();
+
+  // Interactive video cue points
+  {% for q in questions %}
+    {% if q.qtype == "video_cued_mcq_single" %}
+      (function(){
+        const meta = {{ (q.meta_json|loads)|tojson }};
+        const cues = (meta && meta.cues) ? meta.cues : [];
+        const v = document.getElementById("vid_{{ q.id }}");
+        const overlay = document.getElementById("overlay_{{ q.id }}");
+        if (!v || !cues.length) return;
+
+        let cueIndex = 0;
+        function checkCue(){
+          if (cueIndex >= cues.length) return;
+          const t = v.currentTime;
+          const nextCue = cues[cueIndex];
+          if (t >= nextCue){
+            v.pause();
+            overlay.hidden = false;
+            cueIndex += 1;
+          }
+        }
+        v.addEventListener('timeupdate', checkCue);
+
+        const radios = document.querySelectorAll('input[type="radio"][name="q_{{ q.id }}"]');
+        radios.forEach(r => r.addEventListener('change', () => {
+          overlay.hidden = true;
+          v.play();
+        }));
+      })();
+    {% endif %}
+  {% endfor %}
+</script>
+{% endblock %}

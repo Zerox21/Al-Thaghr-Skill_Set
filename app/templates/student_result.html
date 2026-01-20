@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h1>Result — {{ skill.name }}</h1>
+
+  <div class="grid">
+    <div class="stat">
+      <div class="label">Score</div>
+      <div class="value">{{ (attempt.score*100)|round(0) }}%</div>
+    </div>
+    <div class="stat">
+      <div class="label">Correct</div>
+      <div class="value">{{ attempt.correct_count }}/{{ attempt.total_count }}</div>
+    </div>
+    <div class="stat">
+      <div class="label">Time consumed</div>
+      <div class="value">{{ attempt.duration_sec }} sec</div>
+    </div>
+  </div>
+
+  <a class="btn" href="{{ url_for('student.download_report', attempt_id=attempt.id) }}">Download PDF</a>
+  <a class="linkBtn" href="{{ url_for('student.dashboard') }}">Back to dashboard</a>
+
+  <h2>Answers</h2>
+  <table class="table">
+    <thead><tr><th>#</th><th>Question</th><th>Your answer</th><th>Correct</th></tr></thead>
+    <tbody>
+      {% for a in answers %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td>{{ a.prompt }}</td>
+          <td>{{ a.student_answer }}</td>
+          <td>{{ "✅" if a.is_correct else "❌" }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
