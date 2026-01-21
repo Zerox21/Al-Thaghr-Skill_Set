@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: althaghr-skill-tests
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn -c gunicorn.conf.py wsgi:app
+    autoDeploy: true
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false
+      - key: WEEKLY_LIMIT
+        value: "1"
+      - key: WEEKLY_LIMIT_SCOPE
+        value: "student"
+      - key: DEFAULT_TEST_DURATION_MIN
+        value: "20"
+      # Only set STORAGE_DIR if you attach a persistent disk mount (Render paid)
+      # - key: STORAGE_DIR
+      #   value: "/var/data"
