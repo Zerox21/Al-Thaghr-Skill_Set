@@ -6,7 +6,7 @@
 
   <h2>Skill permissions</h2>
   <table class="table">
-    <thead><tr><th>Skill</th><th>Allowed</th><th>Times tested</th><th>Best</th><th>Actions</th></tr></thead>
+    <thead><tr><th>Skill</th><th>Allowed</th><th>Times tested</th><th>Best</th><th>Last result</th><th>Actions</th></tr></thead>
     <tbody>
       {% for sk in skills %}
         {% set perm = perms.get(sk.id) %}
@@ -22,6 +22,10 @@
               {% if a.score and a.score*100 > best %}{% set best = a.score*100 %}{% endif %}
             {% endfor %}
             {{ best|round(0) }}%
+          </td>
+          <td>
+            {% set last = (sk_attempts | selectattr('finished_at') | list) %}
+            {% if last and last[0].passed is not none %}{{ 'PASS' if last[0].passed else 'FAIL' }}{% else %}—{% endif %}
           </td>
           <td>
             <form method="post" action="{{ url_for('teacher.toggle_skill', student_id=student.id) }}" style="display:inline;">

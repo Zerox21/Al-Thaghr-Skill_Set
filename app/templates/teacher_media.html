@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h1>Teacher Media Library</h1>
+  <p class="muted">Upload images/videos to use inside questions. Files are saved under your teacher folder.</p>
+
+  <h2>Upload</h2>
+  <form method="post" action="{{ url_for('teacher.media_upload') }}" enctype="multipart/form-data" class="form">
+    <input type="file" name="file" accept="image/*,video/*" required>
+    <button class="btn" type="submit">Upload</button>
+  </form>
+
+  <h2>Your files</h2>
+  {% if files %}
+    <table class="table">
+      <thead><tr><th>File</th><th>Open</th><th>Meta snippet</th></tr></thead>
+      <tbody>
+        {% for f in files %}
+          {% set rel = "teacher/" ~ current_user.id ~ "/" ~ f %}
+          <tr>
+            <td><code>{{ f }}</code></td>
+            <td><a class="link" href="{{ url_for('files.media', relpath=rel) }}" target="_blank">Open</a></td>
+            <td>
+              {% set ext = f.rsplit('.',1)[-1].lower() %}
+              {% if ext in ['png','jpg','jpeg','gif'] %}
+                <code>{"image_media":"{{ rel }}"}</code>
+              {% else %}
+                <code>{"video_media":"{{ rel }}","cues":[5,12]}</code>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <div class="muted">No media uploaded yet.</div>
+  {% endif %}
+
+  <a class="linkBtn" href="{{ url_for('teacher.dashboard') }}">Back</a>
+</div>
+{% endblock %}

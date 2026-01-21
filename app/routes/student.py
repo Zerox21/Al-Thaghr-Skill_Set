@@ -178,6 +178,7 @@ def submit(attempt_id: int):
     attempt.score = score
     attempt.correct_count = correct
     attempt.total_count = total
+    attempt.passed = passed
     attempt.answers_json = json.dumps(answers_payload, ensure_ascii=False)
 
     lacking = _compute_lacking_skills(current_user.id)
@@ -201,7 +202,9 @@ def submit(attempt_id: int):
             "score_pct": int(round(score*100)),
             "correct": correct,
             "total": total,
-            "lacking_skills": lacking
+            "lacking_skills": lacking,
+            "pass_pct": pass_pct,
+            "pass_fail": "PASS" if passed else "FAIL",
         }
     )
     attempt.pdf_path = pdf_filename

@@ -59,3 +59,6 @@ textarea{resize:vertical;}
 .stat{border:1px solid #e2e8f0;border-radius:14px;padding:12px 14px;background:#fff;}
 .stat .label{color:var(--muted);font-weight:800;font-size:13px;}
 .stat .value{font-size:26px;font-weight:900;margin-top:6px;}
+
+.brand-logo{height:34px;width:auto;border-radius:8px;vertical-align:middle;}
+.brand-text{font-weight:900;}

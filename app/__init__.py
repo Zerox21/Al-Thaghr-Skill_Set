@@ -11,7 +11,13 @@ login_manager.login_view = "auth.login"
 
 def create_app():
     app = Flask(__name__)
+
+    os.makedirs(os.path.join(app.root_path, '..', 'instance'), exist_ok=True)
     app.config.from_object(Config)
+
+    for p in [app.config.get('STORAGE_DIR'), app.config.get('REPORTS_DIR'), app.config.get('UPLOADS_DIR'), app.config.get('MEDIA_DIR')]:
+        if p:
+            os.makedirs(p, exist_ok=True)
 
     # Ensure folders exist (SQLite + persistent storage)
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -51,8 +57,22 @@ def create_app():
     app.register_blueprint(chairman_bp, url_prefix="/chairman")
     app.register_blueprint(files_bp, url_prefix="/files")
 
+    @app.context_processor
+    def inject_brand():
+        return {
+            'brand': {
+                'name': app.config.get('BRAND_NAME'),
+                'tagline': app.config.get('BRAND_TAGLINE'),
+                'primary_color': app.config.get('BRAND_PRIMARY_COLOR'),
+                'logo_path': app.config.get('BRAND_LOGO_PATH'),
+                'favicon_path': app.config.get('BRAND_FAVICON_PATH'),
+            }
+        }
+
     with app.app_context():
         db.create_all()
+        from .migrate import ensure_schema
+        ensure_schema()
         from .seed import ensure_seed_data
         ensure_seed_data()
 

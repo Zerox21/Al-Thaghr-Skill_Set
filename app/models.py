@@ -29,6 +29,7 @@ class Skill(db.Model):
     name = db.Column(db.String(160), nullable=False)
     order_index = db.Column(db.Integer, default=0)
     duration_min = db.Column(db.Integer, nullable=True)
+    pass_pct = db.Column(db.Integer, nullable=True)  # pass threshold percent
     is_active = db.Column(db.Boolean, default=True)
 
 class StudentSkill(db.Model):
@@ -70,6 +71,7 @@ class Attempt(db.Model):
     score = db.Column(db.Float, nullable=True)
     correct_count = db.Column(db.Integer, nullable=True)
     total_count = db.Column(db.Integer, nullable=True)
+    passed = db.Column(db.Boolean, nullable=True)
 
     answers_json = db.Column(db.Text, nullable=True)
     pdf_path = db.Column(db.String(512), nullable=True)

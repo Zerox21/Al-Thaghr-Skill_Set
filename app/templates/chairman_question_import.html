@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h1>Import questions (Chairman)</h1>
+  <p class="muted">Upload CSV or XLSX. Columns: qtype, prompt, options, answer, meta_json, skill_id or skill_name.</p>
+
+  <div class="notice">
+    <b>Options:</b> use <code>|</code> separator e.g. <code>A|B|C|D</code><br>
+    <b>Answer:</b> MCQ uses 0-based index. Multi-select: <code>0,2</code>. Short text: text.<br>
+    <b>Meta:</b> JSON, e.g. <code>{"image_media":"file.png"}</code>
+  </div>
+
+  <form method="post" action="{{ url_for('chairman.question_import_upload') }}" enctype="multipart/form-data" class="form">
+    <label>Default skill</label>
+    <select name="default_skill_id">
+      <option value="">— none —</option>
+      {% for s in skills %}
+        <option value="{{ s.id }}">{{ s.name }}</option>
+      {% endfor %}
+    </select>
+
+    <label>File (.csv or .xlsx)</label>
+    <input type="file" name="file" accept=".csv,.xlsx" required>
+    <button class="btn" type="submit">Import</button>
+  </form>
+
+  <a class="linkBtn" href="{{ url_for('chairman.question_tool') }}">Back</a>
+</div>
+{% endblock %}

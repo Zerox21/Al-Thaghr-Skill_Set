@@ -6,18 +6,20 @@
     <label>Name</label><input name="name" required placeholder="Skill name">
     <label>Order</label><input name="order_index" type="number" value="0">
     <label>Duration minutes (optional)</label><input name="duration_min" type="number" placeholder="e.g. 20">
+    <label>Pass threshold % (e.g. 80)</label><input name="pass_pct" type="number" placeholder="80">
     <button class="btn" type="submit">Add skill</button>
   </form>
 
   <h2>Existing</h2>
   <table class="table">
-    <thead><tr><th>Order</th><th>Name</th><th>Duration</th><th>Active</th></tr></thead>
+    <thead><tr><th>Order</th><th>Name</th><th>Duration</th><th>Pass %</th><th>Active</th></tr></thead>
     <tbody>
       {% for s in skills %}
         <tr>
           <td>{{ s.order_index }}</td>
           <td>{{ s.name }}</td>
           <td>{{ s.duration_min or "default" }}</td>
+          <td>{{ s.pass_pct or 80 }}%</td>
           <td>{{ "✅" if s.is_active else "—" }}</td>
         </tr>
       {% endfor %}

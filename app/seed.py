@@ -35,9 +35,9 @@ def ensure_seed_data():
 
     if Skill.query.count() == 0:
         db.session.add_all([
-            Skill(name="Skill 1: Basics", order_index=1, duration_min=15),
-            Skill(name="Skill 2: Intermediate", order_index=2, duration_min=20),
-            Skill(name="Skill 3: Advanced", order_index=3, duration_min=25),
+            Skill(name="Skill 1: Basics", order_index=1, duration_min=15, pass_pct=80),
+            Skill(name="Skill 2: Intermediate", order_index=2, duration_min=20, pass_pct=80),
+            Skill(name="Skill 3: Advanced", order_index=3, duration_min=25, pass_pct=80),
         ])
 
     db.session.commit()

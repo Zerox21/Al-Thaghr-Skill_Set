@@ -1,0 +1,4 @@
+qtype,prompt,options,answer,meta_json,skill_id,skill_name
+mcq_single,What is 2+2?,1|2|3|4,3,,1,
+image_mcq_single,Identify this shape,A|B|C|D,0,{"image_media":"teacher/t001/shape.png"},,Skill 1: Basics
+video_cued_mcq_single,Answer after watching,Yes|No,0,{"video_media":"teacher/t001/lesson.mp4","cues":[5,12]},,Skill 1: Basics

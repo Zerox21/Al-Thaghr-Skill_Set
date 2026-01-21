@@ -39,9 +39,11 @@
 
     <label>Meta (optional)</label>
     <div class="notice">
-      For <b>image_mcq_single</b>: <code>{"image_url":"/static/uploads/your.png"}</code><br>
-      For <b>video_cued_mcq_single</b>: <code>{"video_url":"/static/uploads/your.mp4","cues":[5,12]}</code>
-    </div>
+      For <b>image_mcq_single</b>: <code>{"image_url":"https://.../x.png"}</code> OR <code>{"image_media":"x.png"}</code><br>
+      For <b>video_cued_mcq_single</b>: <code>{"video_url":"https://.../x.mp4","cues":[5,12]}</code> OR <code>{"video_media":"x.mp4","cues":[5,12]}</code>
+    
+      Tip: Teachers can upload media from Teacher dashboard → Teacher Media. Copy the meta snippet.
+</div>
     <textarea name="meta" rows="3" placeholder='{"image_url":"/static/uploads/img.png"}'></textarea>
 
     <button class="btn" type="submit">Add</button>

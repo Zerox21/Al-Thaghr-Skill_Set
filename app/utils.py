@@ -65,6 +65,7 @@ def generate_attempt_pdf(
     c.drawString(40, y, "Summary"); y -= 16
     c.setFont("Helvetica", 11)
     c.drawString(40, y, f"Score: {summary.get('score_pct','-')}%  Correct: {summary.get('correct','-')}/{summary.get('total','-')}"); y -= 14
+    c.drawString(40, y, f"Pass threshold: {summary.get('pass_pct','-')}%  Result: {summary.get('pass_fail','-')}"); y -= 14
     c.drawString(40, y, f"Most lacking skills (overall): {', '.join(summary.get('lacking_skills', [])) or '-'}"); y -= 22
 
     c.setFont("Helvetica-Bold", 12)

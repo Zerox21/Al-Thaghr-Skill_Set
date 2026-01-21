@@ -13,6 +13,10 @@
       <div class="value">{{ attempt.correct_count }}/{{ attempt.total_count }}</div>
     </div>
     <div class="stat">
+      <div class="label">Pass/Fail</div>
+      <div class="value">{{ 'PASS' if attempt.passed else 'FAIL' }}</div>
+    </div>
+    <div class="stat">
       <div class="label">Time consumed</div>
       <div class="value">{{ attempt.duration_sec }} sec</div>
     </div>
